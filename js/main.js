@@ -180,9 +180,7 @@ async function loadWallpaper(direction = 'next') {
         // 画像をプリロード
         const img = await preloadImage(imageUrl);
         
-        // 画像から色を抽出してグラデーションに適用
-        const dominantColor = extractDominantColor(img);
-        updateGradientColor(dominantColor);
+        // グラデーションは黒固定（CSSで設定）
         
         // スピナー非表示
         showSpinner(false);

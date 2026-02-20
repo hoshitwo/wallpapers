@@ -161,16 +161,15 @@ body {
     height: 100%;
     z-index: 2;
     pointer-events: none;
-    /* 初期グラデーション（JSで動的に変更） */
-    --gradient-color: 0, 0, 0;
+    /* 黒のグラデーションでセーフエリアとなじませる */
     background: linear-gradient(
         to bottom,
-        rgba(var(--gradient-color), 0.7) 0%,
-        rgba(var(--gradient-color), 0.3) 8%,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(0, 0, 0, 0.4) 8%,
         transparent 15%,
         transparent 85%,
-        rgba(var(--gradient-color), 0.3) 92%,
-        rgba(var(--gradient-color), 0.7) 100%
+        rgba(0, 0, 0, 0.4) 92%,
+        rgba(0, 0, 0, 0.8) 100%
     );
 }
 
