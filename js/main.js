@@ -210,44 +210,32 @@ async function loadWallpaper(direction = 'next') {
             }
         }
 
-        // 画像をプリロード
+        // ステップ1: 現在の画像をフェードアウト（黒へ）
+        elements.wallpaper.style.transition = 'opacity 0.4s ease';
+        elements.wallpaper.style.opacity = '0';
+        
+        // フェードアウト完了を待つ
+        await new Promise(resolve => setTimeout(resolve, 400));
+        
+        // ステップ2: 画像をプリロード（プリフェッチ済みならすぐ完了）
         const img = await preloadImage(imageUrl);
         
         // スピナー非表示
         showSpinner(false);
         
-        // シンプルなクロスフェード：現在の画像をフェードアウトしながら新しい画像をフェードイン
-        // wallpaperNextをリセット（非表示・画像なし）
-        elements.wallpaperNext.style.transition = 'none';
-        elements.wallpaperNext.style.opacity = '0';
-        elements.wallpaperNext.style.backgroundImage = `url(${imageUrl})`;
+        // ステップ3: 新しい画像を設定（まだ非表示）
+        elements.wallpaper.style.transition = 'none';
+        elements.wallpaper.style.backgroundImage = `url(${imageUrl})`;
+        elements.wallpaper.offsetHeight; // リフロー
         
-        // 強制的にリフロー（スタイル適用を確実に）
-        elements.wallpaperNext.offsetHeight;
+        // ステップ4: 新しい画像をフェードイン（黒から）
+        elements.wallpaper.style.transition = 'opacity 0.5s ease';
+        elements.wallpaper.style.opacity = '1';
         
-        // トランジションを有効にしてフェードイン
-        elements.wallpaperNext.style.transition = '';
-        elements.wallpaperNext.style.opacity = '1';
-        elements.wallpaper.style.opacity = '0';
+        state.currentImageUrl = imageUrl;
         
-        // トランジション完了後に入れ替え
-        setTimeout(() => {
-            // メインの壁紙に画像をコピー
-            elements.wallpaper.style.transition = 'none';
-            elements.wallpaper.style.backgroundImage = `url(${imageUrl})`;
-            elements.wallpaper.style.opacity = '1';
-            elements.wallpaper.offsetHeight; // リフロー
-            elements.wallpaper.style.transition = '';
-            
-            // 次の壁紙をリセット
-            elements.wallpaperNext.style.transition = 'none';
-            elements.wallpaperNext.style.opacity = '0';
-            elements.wallpaperNext.style.backgroundImage = '';
-            elements.wallpaperNext.offsetHeight;
-            elements.wallpaperNext.style.transition = '';
-            
-            state.currentImageUrl = imageUrl;
-        }, 600);
+        // フェードイン完了を待つ
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // 前へボタンの状態更新
         elements.btnPrev.style.opacity = state.currentIndex > 0 ? '1' : '0.3';
