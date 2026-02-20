@@ -275,6 +275,9 @@ function isDesktopView() {
 function updateGradientFromImage(imageUrl) {
     if (!isDesktopView()) return;
     
+    // まずグラデーションを非表示に
+    elements.overlay.classList.remove('visible');
+    
     const img = new Image();
     img.crossOrigin = 'anonymous';
     
@@ -305,6 +308,11 @@ function updateGradientFromImage(imageUrl) {
             // CSSカスタムプロパティを更新
             elements.overlay.style.setProperty('--gradient-top', `rgba(${darkenedTop.r}, ${darkenedTop.g}, ${darkenedTop.b}, 0.8)`);
             elements.overlay.style.setProperty('--gradient-bottom', `rgba(${darkenedBottom.r}, ${darkenedBottom.g}, ${darkenedBottom.b}, 0.8)`);
+            
+            // 少し遅延してからグラデーションをフェードイン
+            setTimeout(() => {
+                elements.overlay.classList.add('visible');
+            }, 100);
         } catch (e) {
             // CORS エラーなどの場合は無視
             console.log('Could not extract colors from image');
