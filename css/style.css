@@ -164,12 +164,12 @@ body {
     /* 黒のグラデーションでセーフエリアとなじませる */
     background: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.8) 0%,
-        rgba(0, 0, 0, 0.4) 8%,
-        transparent 15%,
-        transparent 85%,
-        rgba(0, 0, 0, 0.4) 92%,
-        rgba(0, 0, 0, 0.8) 100%
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.5) 10%,
+        transparent 20%,
+        transparent 80%,
+        rgba(0, 0, 0, 0.5) 90%,
+        rgba(0, 0, 0, 1) 100%
     );
 }
 
