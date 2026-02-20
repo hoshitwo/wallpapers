@@ -567,9 +567,13 @@ async function saveFilters() {
 }
 
 function clearImagePool() {
-    // フィルター変更時にプールをクリア
+    // フィルター変更時にプールと履歴をクリア
     state.imagePool = [];
     state.usedImageIds.clear();
+    state.history = [];
+    state.currentIndex = -1;
+    // プリロードキャッシュもクリア
+    state.preloadedImages.clear();
 }
 
 // ============================================
