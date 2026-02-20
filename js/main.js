@@ -244,9 +244,6 @@ async function loadWallpaper(direction = 'next') {
         // 少し待ってブラウザに状態を認識させる
         await new Promise(resolve => setTimeout(resolve, 50));
         
-        // ロゴのパルス停止
-        setLogoLoading(false);
-        
         // ステップ4: 新しい画像をフェードイン（黒から）
         elements.wallpaper.style.transition = 'opacity 0.8s ease-out';
         elements.wallpaper.style.opacity = '1';
@@ -255,6 +252,9 @@ async function loadWallpaper(direction = 'next') {
         
         // フェードイン完了を待つ
         await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // フェードイン完了後にロゴのアニメーション停止
+        setLogoLoading(false);
 
         // 前へボタンの状態更新
         elements.btnPrev.style.opacity = state.currentIndex > 0 ? '1' : '0.3';
