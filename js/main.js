@@ -23,7 +23,7 @@ const CONFIG = {
     MAX_HISTORY: 50,
     
     // プリフェッチする画像数
-    PREFETCH_COUNT: 3,
+    PREFETCH_COUNT: 5,
 };
 
 // ============================================
