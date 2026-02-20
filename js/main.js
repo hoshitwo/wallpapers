@@ -75,10 +75,10 @@ const elements = {
     btnFilter: document.getElementById('btn-filter'),
     filterModal: document.getElementById('filter-modal'),
     filterBackdrop: document.getElementById('filter-backdrop'),
-    filterClose: document.getElementById('filter-close'),
     filterUnsplash: document.getElementById('filter-unsplash'),
     filterPixabay: document.getElementById('filter-pixabay'),
     filterCategories: document.getElementById('filter-categories'),
+    btnCancel: document.getElementById('btn-cancel'),
     btnSave: document.getElementById('btn-save'),
 };
 
@@ -583,16 +583,20 @@ function setupFilterListeners() {
     // フィルターボタン
     elements.btnFilter.addEventListener('click', openFilterModal);
     
-    // 閉じるボタン
-    elements.filterClose.addEventListener('click', closeFilterModal);
-    
     // 背景クリックで閉じる
     elements.filterBackdrop.addEventListener('click', closeFilterModal);
     
-    // Pixabayチェックボックス - カテゴリーの表示/非表示を切り替え
+    // Pixabayチェックボックス - カテゴリーの有効/無効を切り替え
     elements.filterPixabay.addEventListener('change', (e) => {
-        elements.filterCategories.style.display = e.target.checked ? 'block' : 'none';
+        if (e.target.checked) {
+            elements.filterCategories.classList.remove('disabled');
+        } else {
+            elements.filterCategories.classList.add('disabled');
+        }
     });
+    
+    // キャンセルボタン
+    elements.btnCancel.addEventListener('click', closeFilterModal);
     
     // 保存ボタン
     elements.btnSave.addEventListener('click', saveFilters);

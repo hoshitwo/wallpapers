@@ -655,21 +655,28 @@ kbd {
     border-top: none;
     margin-top: 4px;
     padding-top: 4px;
+    transition: opacity var(--transition-fast);
+}
+
+.filter-categories.disabled {
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 /* Filter Footer */
 .filter-footer {
+    display: flex;
+    gap: 12px;
     padding: 16px;
     border-top: none;
 }
 
+.btn-cancel,
 .btn-save {
-    width: 100%;
+    flex: 1;
     padding: 12px 20px;
-    background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 10px;
-    color: #000;
     font-family: 'Outfit', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
@@ -677,10 +684,25 @@ kbd {
     transition: all var(--transition-fast);
 }
 
+.btn-cancel {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-save {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+}
+
 .btn-save:hover {
     background: rgba(255, 255, 255, 1);
 }
 
+.btn-cancel:active,
 .btn-save:active {
     transform: scale(0.98);
 }
