@@ -39,6 +39,7 @@ const state = {
 const elements = {
     loader: document.getElementById('loader'),
     spinner: document.getElementById('spinner'),
+    overlay: document.querySelector('.overlay'),
     wallpaper: document.getElementById('wallpaper'),
     wallpaperNext: document.getElementById('wallpaper-next'),
     btnPrev: document.getElementById('btn-prev'),
@@ -65,10 +66,67 @@ function generateWallpaperUrl() {
 function preloadImage(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload = () => resolve(url);
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => resolve(img);
         img.onerror = reject;
         img.src = url;
     });
+}
+
+/**
+ * 画像から主要な色を抽出
+ */
+function extractDominantColor(img) {
+    try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // サンプリング用に小さくリサイズ
+        const sampleSize = 50;
+        canvas.width = sampleSize;
+        canvas.height = sampleSize;
+        
+        ctx.drawImage(img, 0, 0, sampleSize, sampleSize);
+        
+        const imageData = ctx.getImageData(0, 0, sampleSize, sampleSize);
+        const data = imageData.data;
+        
+        let r = 0, g = 0, b = 0;
+        let count = 0;
+        
+        // 上部と下部のピクセルをサンプリング
+        for (let y = 0; y < sampleSize; y++) {
+            // 上部10%と下部10%のみ
+            if (y < sampleSize * 0.1 || y > sampleSize * 0.9) {
+                for (let x = 0; x < sampleSize; x++) {
+                    const i = (y * sampleSize + x) * 4;
+                    r += data[i];
+                    g += data[i + 1];
+                    b += data[i + 2];
+                    count++;
+                }
+            }
+        }
+        
+        // 平均色を計算（少し暗めに調整）
+        r = Math.floor((r / count) * 0.7);
+        g = Math.floor((g / count) * 0.7);
+        b = Math.floor((b / count) * 0.7);
+        
+        return `${r}, ${g}, ${b}`;
+    } catch (e) {
+        console.error('色抽出エラー:', e);
+        return '0, 0, 0';
+    }
+}
+
+/**
+ * グラデーションの色を更新
+ */
+function updateGradientColor(color) {
+    if (elements.overlay) {
+        elements.overlay.style.setProperty('--gradient-color', color);
+    }
 }
 
 /**
@@ -120,7 +178,11 @@ async function loadWallpaper(direction = 'next') {
         }
 
         // 画像をプリロード
-        await preloadImage(imageUrl);
+        const img = await preloadImage(imageUrl);
+        
+        // 画像から色を抽出してグラデーションに適用
+        const dominantColor = extractDominantColor(img);
+        updateGradientColor(dominantColor);
         
         // スピナー非表示
         showSpinner(false);

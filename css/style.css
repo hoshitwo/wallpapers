@@ -159,19 +159,19 @@ body {
     bottom: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.8) 5%,
-        rgba(0, 0, 0, 0.4) 15%,
-        transparent 25%,
-        transparent 50%,
-        rgba(0, 0, 0, 0.4) 75%,
-        rgba(0, 0, 0, 0.8) 90%,
-        rgba(0, 0, 0, 1) 100%
-    );
     z-index: 2;
     pointer-events: none;
+    /* 初期グラデーション（JSで動的に変更） */
+    --gradient-color: 0, 0, 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(var(--gradient-color), 0.7) 0%,
+        rgba(var(--gradient-color), 0.3) 8%,
+        transparent 15%,
+        transparent 85%,
+        rgba(var(--gradient-color), 0.3) 92%,
+        rgba(var(--gradient-color), 0.7) 100%
+    );
 }
 
 /* Content */
