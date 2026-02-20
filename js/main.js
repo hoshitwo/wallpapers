@@ -236,14 +236,14 @@ async function loadWallpaper(direction = 'next') {
         elements.wallpaper.style.backgroundImage = `url(${imageUrl})`;
         elements.wallpaper.offsetHeight; // リフロー
         
-        // ステップ4: 新しい画像をフェードイン（黒から）
-        elements.wallpaper.style.transition = 'opacity 0.5s ease';
+        // ステップ4: 新しい画像をフェードイン（黒から）ゆったりと
+        elements.wallpaper.style.transition = 'opacity 0.8s ease-out';
         elements.wallpaper.style.opacity = '1';
         
         state.currentImageUrl = imageUrl;
         
         // フェードイン完了を待つ
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 800));
 
         // 前へボタンの状態更新
         elements.btnPrev.style.opacity = state.currentIndex > 0 ? '1' : '0.3';
