@@ -50,7 +50,7 @@ const state = {
     filters: {
         unsplash: true,
         pixabay: true,
-        categories: ['nature', 'backgrounds', 'places', 'buildings', 'travel', 'animals', 'food', 'people', 'sports', 'transportation'],
+        categories: ['animals', 'backgrounds', 'buildings', 'business', 'computer', 'education', 'fashion', 'feelings', 'food', 'health', 'industry', 'music', 'nature', 'people', 'places', 'religion', 'science', 'sports', 'transportation', 'travel'],
     },
 };
 
@@ -121,8 +121,10 @@ async function fetchImagesFromPixabay() {
         
         const data = await response.json();
         
-        // 未使用の画像のみをフィルタリング
-        const newImages = data.hits.filter(img => !state.usedImageIds.has(img.id));
+        // 未使用の画像のみをフィルタリング + カテゴリー名を追加
+        const newImages = data.hits
+            .filter(img => !state.usedImageIds.has(img.id))
+            .map(img => ({ ...img, category: randomCategory }));
         
         return newImages;
     } catch (error) {
@@ -262,10 +264,9 @@ function updateSourceDisplay(imageData) {
     if (elements.sourceName) {
         if (imageData.source === 'pixabay') {
             elements.sourceName.textContent = 'Pixabay';
-            // カテゴリー（タグ）を表示
-            if (imageData.tags && elements.sourceCategory) {
-                const firstTag = imageData.tags.split(',')[0].trim();
-                elements.sourceCategory.textContent = firstTag || '';
+            // カテゴリー名を表示
+            if (elements.sourceCategory) {
+                elements.sourceCategory.textContent = imageData.category || '';
             }
         } else {
             elements.sourceName.textContent = 'Unsplash';
