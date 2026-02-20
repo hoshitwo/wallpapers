@@ -104,11 +104,10 @@ body {
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    transition: opacity 0.3s ease;
 }
 
 .spinner.hidden {
-    opacity: 0;
+    display: none;
 }
 
 .spinner-ring {
