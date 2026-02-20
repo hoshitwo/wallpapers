@@ -182,11 +182,16 @@ async function loadWallpaper(direction = 'next') {
         
         // グラデーションは黒固定（CSSで設定）
         
-        // スピナー非表示
+        // 次の壁紙を非表示状態で画像を設定
+        elements.wallpaperNext.style.opacity = '0';
+        elements.wallpaperNext.style.backgroundImage = `url(${imageUrl})`;
+        
+        // 画像が設定されてからスピナー非表示
+        await new Promise(resolve => setTimeout(resolve, 50));
         showSpinner(false);
         
-        // トランジション
-        elements.wallpaperNext.style.backgroundImage = `url(${imageUrl})`;
+        // トランジション開始
+        elements.wallpaperNext.style.opacity = '';
         elements.wallpaper.classList.add('fade-out');
         elements.wallpaperNext.classList.add('fade-in');
         
@@ -219,8 +224,9 @@ async function loadWallpaper(direction = 'next') {
 async function shareWallpaper() {
     if (!state.currentImageUrl) return;
 
-    // フィードバック
-    elements.btnShare.style.transform = 'scale(0.9)';
+    // ローディング状態を表示
+    elements.btnShare.classList.add('loading');
+    elements.btnShare.style.pointerEvents = 'none';
     
     try {
         // 高解像度版のURLを生成
@@ -265,9 +271,9 @@ async function shareWallpaper() {
             window.open(hdUrl, '_blank');
         }
     } finally {
-        setTimeout(() => {
-            elements.btnShare.style.transform = '';
-        }, 200);
+        // ローディング状態を解除
+        elements.btnShare.classList.remove('loading');
+        elements.btnShare.style.pointerEvents = '';
     }
 }
 
