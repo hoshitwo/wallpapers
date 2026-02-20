@@ -298,13 +298,13 @@ function updateGradientFromImage(imageUrl) {
             const bottomData = ctx.getImageData(0, Math.floor(sampleSize * 0.9), sampleSize, Math.floor(sampleSize * 0.1));
             const bottomColor = getAverageColor(bottomData.data);
             
-            // 色を明るく調整（暗すぎないように）
-            const brightenedTop = brightenColor(topColor, 0.4);
-            const brightenedBottom = brightenColor(bottomColor, 0.4);
+            // 色を少し暗めに調整
+            const darkenedTop = darkenColor(topColor, 0.3);
+            const darkenedBottom = darkenColor(bottomColor, 0.3);
             
             // CSSカスタムプロパティを更新
-            elements.overlay.style.setProperty('--gradient-top', `rgba(${brightenedTop.r}, ${brightenedTop.g}, ${brightenedTop.b}, 0.7)`);
-            elements.overlay.style.setProperty('--gradient-bottom', `rgba(${brightenedBottom.r}, ${brightenedBottom.g}, ${brightenedBottom.b}, 0.7)`);
+            elements.overlay.style.setProperty('--gradient-top', `rgba(${darkenedTop.r}, ${darkenedTop.g}, ${darkenedTop.b}, 0.8)`);
+            elements.overlay.style.setProperty('--gradient-bottom', `rgba(${darkenedBottom.r}, ${darkenedBottom.g}, ${darkenedBottom.b}, 0.8)`);
         } catch (e) {
             // CORS エラーなどの場合は無視
             console.log('Could not extract colors from image');
@@ -335,13 +335,13 @@ function getAverageColor(data) {
 }
 
 /**
- * 色を明るく調整
+ * 色を暗く調整
  */
-function brightenColor(color, factor) {
+function darkenColor(color, factor) {
     return {
-        r: Math.min(255, Math.round(color.r + (255 - color.r) * factor)),
-        g: Math.min(255, Math.round(color.g + (255 - color.g) * factor)),
-        b: Math.min(255, Math.round(color.b + (255 - color.b) * factor))
+        r: Math.round(color.r * (1 - factor)),
+        g: Math.round(color.g * (1 - factor)),
+        b: Math.round(color.b * (1 - factor))
     };
 }
 
