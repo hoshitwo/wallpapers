@@ -397,12 +397,33 @@ kbd {
     }
 }
 
-.content {
-    animation: fadeIn 0.8s ease 0.3s both;
+@keyframes slideDown {
+    from { 
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to { 
+        opacity: 0.7;
+        transform: translateY(0);
+    }
+}
+
+/* 初期状態：非表示 */
+.header {
+    opacity: 0;
 }
 
 .controls {
-    animation: slideUp 0.8s ease 0.5s both;
+    opacity: 0;
+}
+
+/* 初回ロード完了後のアニメーション */
+.header.loaded {
+    animation: slideDown 0.8s ease forwards;
+}
+
+.controls.loaded {
+    animation: slideUp 0.8s ease 0.2s forwards;
 }
 
 /* Touch feedback for mobile */

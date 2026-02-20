@@ -50,6 +50,8 @@ const elements = {
     btnNext: document.getElementById('btn-next'),
     btnShare: document.getElementById('btn-share'),
     logoText: document.querySelector('.logo-text'),
+    header: document.querySelector('.header'),
+    controls: document.querySelector('.controls'),
 };
 
 // ============================================
@@ -405,6 +407,12 @@ async function init() {
     
     // ローダーを非表示
     elements.loader.classList.add('hidden');
+    
+    // UIをフェードイン（初回ロード時のみ）
+    requestAnimationFrame(() => {
+        elements.header.classList.add('loaded');
+        elements.controls.classList.add('loaded');
+    });
     
     // イベントリスナーを設定
     setupEventListeners();
