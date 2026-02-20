@@ -222,7 +222,7 @@ body {
     text-orientation: mixed;
 }
 
-.logo-text.loading {
+.logo-text.shimmer {
     background: linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.4) 0%,
