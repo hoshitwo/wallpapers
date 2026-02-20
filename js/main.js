@@ -250,8 +250,16 @@ async function loadWallpaper(direction = 'next') {
         
         state.currentImageUrl = imageUrl;
         
-        // フェードイン完了を待つ
-        await new Promise(resolve => setTimeout(resolve, 800));
+        // フェードイン完了を確実に検知
+        await new Promise(resolve => {
+            const onTransitionEnd = () => {
+                elements.wallpaper.removeEventListener('transitionend', onTransitionEnd);
+                resolve();
+            };
+            elements.wallpaper.addEventListener('transitionend', onTransitionEnd);
+            // フォールバック：2秒経っても終わらなければ強制的に進む
+            setTimeout(resolve, 2000);
+        });
         
         // フェードイン完了後にロゴのアニメーション停止
         setLogoLoading(false);
