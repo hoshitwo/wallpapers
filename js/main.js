@@ -134,12 +134,68 @@ async function fetchImagesFromPixabay() {
 }
 
 /**
- * 画像プールを補充
+ * 画像プールを補充（複数カテゴリーから取得してシャッフル）
  */
 async function refillImagePool() {
     if (state.imagePool.length < CONFIG.PREFETCH_COUNT) {
-        const newImages = await fetchImagesFromPixabay();
-        state.imagePool.push(...newImages);
+        const categories = state.filters.categories;
+        
+        if (categories.length === 0) {
+            return;
+        }
+        
+        // 複数のカテゴリーから画像を取得
+        const numCategoriesToFetch = Math.min(5, categories.length);
+        const shuffledCategories = [...categories].sort(() => Math.random() - 0.5);
+        const selectedCategories = shuffledCategories.slice(0, numCategoriesToFetch);
+        
+        // 各カテゴリーから並行で取得
+        const fetchPromises = selectedCategories.map(category => 
+            fetchImagesFromPixabayByCategory(category)
+        );
+        
+        const results = await Promise.all(fetchPromises);
+        const allImages = results.flat();
+        
+        // シャッフルしてプールに追加
+        const shuffledImages = allImages.sort(() => Math.random() - 0.5);
+        state.imagePool.push(...shuffledImages);
+    }
+}
+
+/**
+ * 指定カテゴリーからPixabay画像を取得
+ */
+async function fetchImagesFromPixabayByCategory(category) {
+    const randomPage = Math.floor(Math.random() * 50) + 1;
+    
+    const params = new URLSearchParams({
+        key: CONFIG.PIXABAY_API_KEY,
+        image_type: 'photo',
+        orientation: 'vertical',
+        min_height: 1920,
+        safesearch: 'true',
+        per_page: 5, // 各カテゴリーから5枚ずつ
+        page: randomPage,
+        order: 'popular',
+        category: category,
+    });
+    
+    try {
+        const response = await fetch(`${CONFIG.PIXABAY_BASE}?${params}`);
+        
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        return data.hits
+            .filter(img => !state.usedImageIds.has(img.id))
+            .map(img => ({ ...img, category: category }));
+    } catch (error) {
+        console.error(`Pixabay API エラー (${category}):`, error);
+        return [];
     }
 }
 
