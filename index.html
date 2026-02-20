@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <title>WALLPAPERS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Share+Tech&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen (初期) -->
+    <div class="loader" id="loader">
+        <div class="loader-ring"></div>
+    </div>
+
+    <!-- Loading Spinner (画像切替時) -->
+    <div class="spinner hidden" id="spinner">
+        <div class="spinner-ring"></div>
+    </div>
+
+    <!-- Background Wallpaper -->
+    <div class="wallpaper" id="wallpaper"></div>
+    <div class="wallpaper wallpaper-next" id="wallpaper-next"></div>
+
+    <!-- Overlay Gradient -->
+    <div class="overlay"></div>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-text">WALLPAPERS</span>
+            </div>
+        </header>
+
+        <!-- Controls -->
+        <nav class="controls">
+            <button class="btn btn-prev" id="btn-prev" aria-label="前の画像">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+
+            <button class="btn btn-share" id="btn-share" aria-label="共有">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
+                </svg>
+            </button>
+
+            <button class="btn btn-next" id="btn-next" aria-label="次の画像">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </nav>
+
+        <!-- Hint -->
+        <div class="hint">
+            <kbd>←</kbd> <kbd>→</kbd> で移動 <kbd>S</kbd> で共有
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

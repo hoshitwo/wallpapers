@@ -1,0 +1,364 @@
+/* ===================================
+   Answer - iPhone Wallpaper Gallery
+   =================================== */
+
+:root {
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-glass: rgba(255, 255, 255, 0.1);
+    --color-glass-border: rgba(255, 255, 255, 0.2);
+    --color-glass-hover: rgba(255, 255, 255, 0.2);
+    --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+    background-color: #000;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+body {
+    min-height: 100%;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+    overflow: hidden;
+    background-color: #000;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* Safe area対応 */
+    padding: 0;
+    margin: 0;
+}
+
+/* iOS Safari ホームバー対策 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    html, body {
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--color-black);
+    color: var(--color-white);
+    cursor: default;
+    user-select: none;
+}
+
+/* Loader */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-black);
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-ring {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--color-glass-border);
+    border-top-color: var(--color-white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Spinner (画像切替時) */
+.spinner {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.spinner.hidden {
+    opacity: 0;
+}
+
+.spinner-ring {
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Wallpaper Background */
+.wallpaper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity var(--transition-slow);
+    z-index: 1;
+}
+
+.wallpaper-next {
+    opacity: 0;
+    z-index: 0;
+}
+
+.wallpaper.fade-out {
+    opacity: 0;
+}
+
+.wallpaper-next.fade-in {
+    opacity: 1;
+    z-index: 1;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        transparent 20%,
+        transparent 50%,
+        rgba(0, 0, 0, 0.4) 75%,
+        rgba(0, 0, 0, 0.8) 90%,
+        rgba(0, 0, 0, 1) 100%
+    );
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Content */
+.content {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(20px, 5vw, 40px);
+    padding-top: calc(clamp(20px, 5vw, 40px) + env(safe-area-inset-top));
+    padding-bottom: calc(clamp(20px, 5vw, 40px) + env(safe-area-inset-bottom));
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.logo-text {
+    font-family: 'Share Tech', sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+.logo-sub {
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.counter {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0.8;
+    backdrop-filter: blur(10px);
+    background: var(--color-glass);
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--color-glass-border);
+}
+
+.counter-divider {
+    opacity: 0.5;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(12px, 4vw, 24px);
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--color-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 100px;
+    color: var(--color-white);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.btn:hover {
+    background: var(--color-glass-hover);
+    transform: scale(1.05);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.btn-prev,
+.btn-next {
+    width: 56px;
+    height: 56px;
+}
+
+.btn-share {
+    width: 80px;
+    height: 80px;
+    background: var(--color-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--color-glass-border);
+}
+
+.btn-share svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Hint */
+.hint {
+    text-align: center;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    background: var(--color-glass);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.7rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .hint {
+        display: none;
+    }
+}
+
+/* Animation Classes */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content {
+    animation: fadeIn 0.8s ease 0.3s both;
+}
+
+.controls {
+    animation: slideUp 0.8s ease 0.5s both;
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) {
+    .btn:hover {
+        transform: none;
+        background: var(--color-glass);
+    }
+    
+    .btn:active {
+        background: var(--color-glass-hover);
+        transform: scale(0.95);
+    }
+}

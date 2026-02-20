@@ -1,0 +1,10 @@
+{
+  "name": "WALLPAPERS",
+  "short_name": "Wallpapers",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait"
+}
+
