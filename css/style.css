@@ -210,9 +210,11 @@ body {
     font-family: 'Share Tech', sans-serif;
     font-size: clamp(0.9rem, 2.4vw, 1.2rem);
     font-weight: 400;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.15em;
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
     color: rgba(255, 255, 255, 0.7);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
 }
 
 .logo-text.loading {
