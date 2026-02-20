@@ -251,6 +251,20 @@ body {
     opacity: 0.7;
 }
 
+/* Source */
+.source {
+    text-align: right;
+}
+
+.source-text {
+    font-family: 'Share Tech', sans-serif;
+    font-size: clamp(0.45rem, 1.2vw, 0.6rem);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+}
+
 .counter {
     display: flex;
     align-items: baseline;
