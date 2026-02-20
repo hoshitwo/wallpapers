@@ -49,6 +49,7 @@ const elements = {
     btnPrev: document.getElementById('btn-prev'),
     btnNext: document.getElementById('btn-next'),
     btnShare: document.getElementById('btn-share'),
+    logoText: document.querySelector('.logo-text'),
 };
 
 // ============================================
@@ -168,6 +169,17 @@ function showSpinner(show) {
 }
 
 /**
+ * ロゴのローディング状態を制御
+ */
+function setLogoLoading(loading) {
+    if (loading) {
+        elements.logoText.classList.add('loading');
+    } else {
+        elements.logoText.classList.remove('loading');
+    }
+}
+
+/**
  * 壁紙を読み込んで表示
  */
 async function loadWallpaper(direction = 'next') {
@@ -211,8 +223,8 @@ async function loadWallpaper(direction = 'next') {
             }
         }
 
-        // スピナー表示（読み込み中ずっと表示）
-        showSpinner(true);
+        // ロゴをパルス表示（読み込み中）
+        setLogoLoading(true);
         
         // ステップ1: 現在の画像をフェードアウト（黒へ）
         elements.wallpaper.style.transition = 'opacity 0.5s ease';
@@ -232,8 +244,8 @@ async function loadWallpaper(direction = 'next') {
         // 少し待ってブラウザに状態を認識させる
         await new Promise(resolve => setTimeout(resolve, 50));
         
-        // スピナー非表示
-        showSpinner(false);
+        // ロゴのパルス停止
+        setLogoLoading(false);
         
         // ステップ4: 新しい画像をフェードイン（黒から）
         elements.wallpaper.style.transition = 'opacity 0.8s ease-out';

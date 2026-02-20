@@ -202,6 +202,16 @@ body {
     letter-spacing: 0.05em;
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
     opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.logo-text.loading {
+    animation: logoPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.3; }
 }
 
 .logo-sub {
