@@ -311,22 +311,26 @@ body {
 
 .btn-prev,
 .btn-next {
-    width: 56px;
-    height: 56px;
+    width: 44px;
+    height: 44px;
+    opacity: 0.6;
+}
+
+.btn-prev svg,
+.btn-next svg {
+    width: 16px;
+    height: 16px;
 }
 
 .btn-share {
-    width: 80px;
-    height: 80px;
-    background: var(--color-glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--color-glass-border);
+    width: 44px;
+    height: 44px;
+    opacity: 0.6;
 }
 
 .btn-share svg {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
 }
 
 .btn-share.loading svg {
@@ -335,8 +339,8 @@ body {
 
 .btn-share.loading::after {
     content: '';
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
