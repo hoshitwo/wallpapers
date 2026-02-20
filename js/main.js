@@ -219,10 +219,19 @@ function setLogoLoading(loading) {
 /**
  * ソース表示を更新
  */
-function updateSourceDisplay(source) {
+function updateSourceDisplay(imageData) {
     if (elements.sourceText) {
-        if (source === 'pixabay') {
-            elements.sourceText.textContent = 'via Pixabay';
+        if (imageData.source === 'pixabay') {
+            // Pixabayの場合はタグ（カテゴリー）も表示
+            let text = 'via Pixabay';
+            if (imageData.tags) {
+                // 最初のタグだけ表示（カンマ区切りの最初の要素）
+                const firstTag = imageData.tags.split(',')[0].trim();
+                if (firstTag) {
+                    text = `${firstTag} · Pixabay`;
+                }
+            }
+            elements.sourceText.textContent = text;
         } else {
             elements.sourceText.textContent = 'via Unsplash';
         }
@@ -321,7 +330,7 @@ async function loadWallpaper(direction = 'next') {
         state.currentSource = imageData.source;
         
         // ソース表示を更新
-        updateSourceDisplay(imageData.source);
+        updateSourceDisplay(imageData);
         
         // フェードイン完了を待つ（トランジション時間 + バッファ）
         await new Promise(resolve => setTimeout(resolve, 900));
