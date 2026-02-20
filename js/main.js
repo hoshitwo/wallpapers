@@ -211,32 +211,31 @@ async function loadWallpaper(direction = 'next') {
             }
         }
 
+        // スピナー表示（読み込み中ずっと表示）
+        showSpinner(true);
+        
         // ステップ1: 現在の画像をフェードアウト（黒へ）
-        elements.wallpaper.style.transition = 'opacity 0.4s ease';
+        elements.wallpaper.style.transition = 'opacity 0.5s ease';
         elements.wallpaper.style.opacity = '0';
         
         // フェードアウト完了を待つ
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        // スピナー表示
-        showSpinner(true);
+        // ステップ2: 画像をプリロード
+        const img = await preloadImage(imageUrl);
         
-        // ステップ2: 画像をプリロード（プリフェッチ済みならすぐ完了）
-        // 最低300ms表示してリッチ感を出す
-        const [img] = await Promise.all([
-            preloadImage(imageUrl),
-            new Promise(resolve => setTimeout(resolve, 300))
-        ]);
+        // ステップ3: 新しい画像を設定（まだ非表示のまま）
+        elements.wallpaper.style.transition = 'none';
+        elements.wallpaper.style.backgroundImage = `url(${imageUrl})`;
+        elements.wallpaper.offsetHeight; // リフロー強制
+        
+        // 少し待ってブラウザに状態を認識させる
+        await new Promise(resolve => setTimeout(resolve, 50));
         
         // スピナー非表示
         showSpinner(false);
         
-        // ステップ3: 新しい画像を設定（まだ非表示）
-        elements.wallpaper.style.transition = 'none';
-        elements.wallpaper.style.backgroundImage = `url(${imageUrl})`;
-        elements.wallpaper.offsetHeight; // リフロー
-        
-        // ステップ4: 新しい画像をフェードイン（黒から）ゆったりと
+        // ステップ4: 新しい画像をフェードイン（黒から）
         elements.wallpaper.style.transition = 'opacity 0.8s ease-out';
         elements.wallpaper.style.opacity = '1';
         
