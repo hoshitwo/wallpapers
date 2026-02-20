@@ -242,11 +242,15 @@ body {
 
 /* Controls */
 .controls {
+    position: fixed;
+    bottom: calc(30px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: clamp(16px, 5vw, 32px);
-    margin-bottom: 10px;
+    z-index: 20;
 }
 
 .btn {
