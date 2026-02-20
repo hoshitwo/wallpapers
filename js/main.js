@@ -213,31 +213,41 @@ async function loadWallpaper(direction = 'next') {
         // 画像をプリロード
         const img = await preloadImage(imageUrl);
         
-        // グラデーションは黒固定（CSSで設定）
+        // スピナー非表示
+        showSpinner(false);
         
-        // 次の壁紙を非表示状態で画像を設定
+        // シンプルなクロスフェード：現在の画像をフェードアウトしながら新しい画像をフェードイン
+        // wallpaperNextをリセット（非表示・画像なし）
+        elements.wallpaperNext.style.transition = 'none';
         elements.wallpaperNext.style.opacity = '0';
         elements.wallpaperNext.style.backgroundImage = `url(${imageUrl})`;
         
-        // 画像が設定されてからスピナー非表示
-        await new Promise(resolve => setTimeout(resolve, 50));
-        showSpinner(false);
+        // 強制的にリフロー（スタイル適用を確実に）
+        elements.wallpaperNext.offsetHeight;
         
-        // トランジション開始
-        elements.wallpaperNext.style.opacity = '';
-        elements.wallpaper.classList.add('fade-out');
-        elements.wallpaperNext.classList.add('fade-in');
+        // トランジションを有効にしてフェードイン
+        elements.wallpaperNext.style.transition = '';
+        elements.wallpaperNext.style.opacity = '1';
+        elements.wallpaper.style.opacity = '0';
         
         // トランジション完了後に入れ替え
         setTimeout(() => {
+            // メインの壁紙に画像をコピー
+            elements.wallpaper.style.transition = 'none';
             elements.wallpaper.style.backgroundImage = `url(${imageUrl})`;
-            elements.wallpaper.classList.remove('fade-out');
-            elements.wallpaperNext.classList.remove('fade-in');
+            elements.wallpaper.style.opacity = '1';
+            elements.wallpaper.offsetHeight; // リフロー
+            elements.wallpaper.style.transition = '';
+            
+            // 次の壁紙をリセット
+            elements.wallpaperNext.style.transition = 'none';
+            elements.wallpaperNext.style.opacity = '0';
+            elements.wallpaperNext.style.backgroundImage = '';
+            elements.wallpaperNext.offsetHeight;
+            elements.wallpaperNext.style.transition = '';
+            
             state.currentImageUrl = imageUrl;
-            // html/bodyにも背景を設定（セーフエリア対策）
-            document.documentElement.style.backgroundImage = `url(${imageUrl})`;
-            document.body.style.backgroundImage = `url(${imageUrl})`;
-        }, 800);
+        }, 600);
 
         // 前へボタンの状態更新
         elements.btnPrev.style.opacity = state.currentIndex > 0 ? '1' : '0.3';
@@ -377,12 +387,6 @@ async function init() {
     
     // 次の画像をバックグラウンドでプリフェッチ
     prefetchNextImages();
-    
-    // 初期背景をhtml/bodyにも設定
-    if (state.currentImageUrl) {
-        document.documentElement.style.backgroundImage = `url(${state.currentImageUrl})`;
-        document.body.style.backgroundImage = `url(${state.currentImageUrl})`;
-    }
     
     // ローダーを非表示
     elements.loader.classList.add('hidden');

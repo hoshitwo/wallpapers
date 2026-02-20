@@ -132,22 +132,13 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition: opacity var(--transition-slow);
+    transition: opacity 0.5s ease;
     z-index: 1;
 }
 
 .wallpaper-next {
     opacity: 0;
-    z-index: 0;
-}
-
-.wallpaper.fade-out {
-    opacity: 0;
-}
-
-.wallpaper-next.fade-in {
-    opacity: 1;
-    z-index: 1;
+    z-index: 2;
 }
 
 /* Overlay */
