@@ -21,6 +21,9 @@ const CONFIG = {
     
     // 履歴の最大保持数
     MAX_HISTORY: 50,
+    
+    // プリフェッチする画像数
+    PREFETCH_COUNT: 3,
 };
 
 // ============================================
@@ -31,6 +34,7 @@ const state = {
     history: [],
     isLoading: false,
     currentImageUrl: null,
+    preloadedImages: new Map(), // プリロード済み画像のキャッシュ
 };
 
 // ============================================
@@ -64,13 +68,36 @@ function generateWallpaperUrl() {
  * 画像をプリロード
  */
 function preloadImage(url) {
+    // キャッシュにあればそれを返す
+    if (state.preloadedImages.has(url)) {
+        return Promise.resolve(state.preloadedImages.get(url));
+    }
+    
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = 'Anonymous';
-        img.onload = () => resolve(img);
+        img.onload = () => {
+            state.preloadedImages.set(url, img);
+            resolve(img);
+        };
         img.onerror = reject;
         img.src = url;
     });
+}
+
+/**
+ * 次の画像を先読み
+ */
+async function prefetchNextImages() {
+    const startIndex = state.history.length;
+    
+    for (let i = 0; i < CONFIG.PREFETCH_COUNT; i++) {
+        const url = generateWallpaperUrl();
+        state.history.push(url);
+        
+        // バックグラウンドでプリロード（エラーは無視）
+        preloadImage(url).catch(() => {});
+    }
 }
 
 /**
@@ -159,21 +186,27 @@ async function loadWallpaper(direction = 'next') {
             imageUrl = state.history[state.currentIndex];
         } else if (direction === 'next') {
             // 次の画像
-            if (state.currentIndex < state.history.length - 1) {
-                // 履歴に次がある場合
-                state.currentIndex++;
+            state.currentIndex++;
+            
+            if (state.currentIndex < state.history.length) {
+                // 履歴に次がある場合（プリフェッチ済み）
                 imageUrl = state.history[state.currentIndex];
             } else {
                 // 新しい画像を取得
                 imageUrl = generateWallpaperUrl();
                 state.history.push(imageUrl);
-                state.currentIndex = state.history.length - 1;
-                
-                // 履歴の最大数を超えたら古いものを削除
-                if (state.history.length > CONFIG.MAX_HISTORY) {
-                    state.history.shift();
-                    state.currentIndex--;
-                }
+            }
+            
+            // 残りのプリフェッチ画像が少なくなったら追加でプリフェッチ
+            const remainingPrefetched = state.history.length - state.currentIndex - 1;
+            if (remainingPrefetched < CONFIG.PREFETCH_COUNT) {
+                prefetchNextImages();
+            }
+            
+            // 履歴の最大数を超えたら古いものを削除
+            if (state.history.length > CONFIG.MAX_HISTORY) {
+                state.history.shift();
+                state.currentIndex--;
             }
         }
 
@@ -341,6 +374,9 @@ function setupEventListeners() {
 async function init() {
     // 初期の壁紙を読み込み
     await loadWallpaper('next');
+    
+    // 次の画像をバックグラウンドでプリフェッチ
+    prefetchNextImages();
     
     // 初期背景をhtml/bodyにも設定
     if (state.currentImageUrl) {
