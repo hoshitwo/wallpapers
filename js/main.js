@@ -63,7 +63,8 @@ const elements = {
     logoText: document.querySelector('.logo-text'),
     header: document.querySelector('.header'),
     controls: document.querySelector('.controls'),
-    sourceText: document.querySelector('.source-text'),
+    sourceName: document.querySelector('.source-name'),
+    sourceCategory: document.querySelector('.source-category'),
 };
 
 // ============================================
@@ -220,20 +221,19 @@ function setLogoLoading(loading) {
  * ソース表示を更新
  */
 function updateSourceDisplay(imageData) {
-    if (elements.sourceText) {
+    if (elements.sourceName) {
         if (imageData.source === 'pixabay') {
-            // Pixabayの場合はタグ（カテゴリー）も表示
-            let text = 'via Pixabay';
-            if (imageData.tags) {
-                // 最初のタグだけ表示（カンマ区切りの最初の要素）
+            elements.sourceName.textContent = 'Pixabay';
+            // カテゴリー（タグ）を表示
+            if (imageData.tags && elements.sourceCategory) {
                 const firstTag = imageData.tags.split(',')[0].trim();
-                if (firstTag) {
-                    text = `${firstTag} · Pixabay`;
-                }
+                elements.sourceCategory.textContent = firstTag || '';
             }
-            elements.sourceText.textContent = text;
         } else {
-            elements.sourceText.textContent = 'via Unsplash';
+            elements.sourceName.textContent = 'Unsplash';
+            if (elements.sourceCategory) {
+                elements.sourceCategory.textContent = '';
+            }
         }
     }
 }
