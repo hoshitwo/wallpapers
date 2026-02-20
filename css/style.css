@@ -451,8 +451,8 @@ body {
 @media (min-width: 768px) and (hover: hover) {
     .hint {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
+        bottom: clamp(20px, 5vw, 40px);
+        right: clamp(20px, 5vw, 40px);
         z-index: 15;
     }
 }
