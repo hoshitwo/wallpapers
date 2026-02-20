@@ -79,6 +79,7 @@ const elements = {
     filterUnsplash: document.getElementById('filter-unsplash'),
     filterPixabay: document.getElementById('filter-pixabay'),
     filterCategories: document.getElementById('filter-categories'),
+    btnSave: document.getElementById('btn-save'),
 };
 
 // ============================================
@@ -531,35 +532,37 @@ function setupFilterListeners() {
     // 背景クリックで閉じる
     elements.filterBackdrop.addEventListener('click', closeFilterModal);
     
-    // Unsplashチェックボックス
-    elements.filterUnsplash.addEventListener('change', (e) => {
-        state.filters.unsplash = e.target.checked;
-        clearImagePool();
-    });
-    
-    // Pixabayチェックボックス
+    // Pixabayチェックボックス - カテゴリーの表示/非表示を切り替え
     elements.filterPixabay.addEventListener('change', (e) => {
-        state.filters.pixabay = e.target.checked;
-        // カテゴリーの表示/非表示を切り替え
         elements.filterCategories.style.display = e.target.checked ? 'block' : 'none';
-        clearImagePool();
     });
     
-    // カテゴリーチェックボックス
+    // 保存ボタン
+    elements.btnSave.addEventListener('click', saveFilters);
+}
+
+async function saveFilters() {
+    // フィルター設定を取得
+    state.filters.unsplash = elements.filterUnsplash.checked;
+    state.filters.pixabay = elements.filterPixabay.checked;
+    
+    // カテゴリー設定を取得
     const categoryCheckboxes = elements.filterCategories.querySelectorAll('input[data-category]');
+    state.filters.categories = [];
     categoryCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', (e) => {
-            const category = e.target.dataset.category;
-            if (e.target.checked) {
-                if (!state.filters.categories.includes(category)) {
-                    state.filters.categories.push(category);
-                }
-            } else {
-                state.filters.categories = state.filters.categories.filter(c => c !== category);
-            }
-            clearImagePool();
-        });
+        if (checkbox.checked) {
+            state.filters.categories.push(checkbox.dataset.category);
+        }
     });
+    
+    // 画像プールをクリア
+    clearImagePool();
+    
+    // モーダルを閉じる
+    closeFilterModal();
+    
+    // 新しいフィルターで画像を取得
+    await loadWallpaper('next');
 }
 
 function clearImagePool() {
