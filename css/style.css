@@ -703,8 +703,14 @@ kbd {
     color: #000;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
     background: rgba(255, 255, 255, 1);
+}
+
+.btn-save:disabled {
+    background: rgba(255, 255, 255, 0.3);
+    color: rgba(0, 0, 0, 0.3);
+    cursor: not-allowed;
 }
 
 .btn-cancel:active,

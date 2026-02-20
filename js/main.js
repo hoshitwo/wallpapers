@@ -578,10 +578,17 @@ function setupEventListeners() {
 
 function openFilterModal() {
     elements.filterModal.classList.remove('hidden');
+    updateSaveButtonState();
 }
 
 function closeFilterModal() {
     elements.filterModal.classList.add('hidden');
+}
+
+function updateSaveButtonState() {
+    // Unsplash と Pixabay の両方がオフの場合は Save を無効化
+    const canSave = elements.filterUnsplash.checked || elements.filterPixabay.checked;
+    elements.btnSave.disabled = !canSave;
 }
 
 function setupFilterListeners() {
@@ -591,13 +598,17 @@ function setupFilterListeners() {
     // 背景クリックで閉じる
     elements.filterBackdrop.addEventListener('click', closeFilterModal);
     
-    // Pixabayチェックボックス - カテゴリーの有効/無効を切り替え
+    // Unsplashチェックボックス - Saveボタンの状態を更新
+    elements.filterUnsplash.addEventListener('change', updateSaveButtonState);
+    
+    // Pixabayチェックボックス - カテゴリーの有効/無効を切り替え + Saveボタンの状態を更新
     elements.filterPixabay.addEventListener('change', (e) => {
         if (e.target.checked) {
             elements.filterCategories.classList.remove('disabled');
         } else {
             elements.filterCategories.classList.add('disabled');
         }
+        updateSaveButtonState();
     });
     
     // キャンセルボタン
