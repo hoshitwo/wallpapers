@@ -219,23 +219,23 @@ body {
 
 .logo-text.loading {
     background: linear-gradient(
-        90deg,
+        180deg,
         rgba(255, 255, 255, 0.4) 0%,
         rgba(255, 255, 255, 0.4) 25%,
         rgba(255, 255, 255, 1) 50%,
         rgba(255, 255, 255, 0.4) 75%,
         rgba(255, 255, 255, 0.4) 100%
     );
-    background-size: 300% 100%;
+    background-size: 100% 300%;
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
-    animation: shimmer 1.5s linear infinite;
+    animation: shimmerVertical 1.5s linear infinite;
 }
 
-@keyframes shimmer {
-    0% { background-position: 100% 0; }
-    100% { background-position: 0% 0; }
+@keyframes shimmerVertical {
+    0% { background-position: 0 100%; }
+    100% { background-position: 0 0%; }
 }
 
 .logo-sub {
