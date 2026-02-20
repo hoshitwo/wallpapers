@@ -239,10 +239,18 @@ async function loadWallpaper(direction = 'next') {
         // ステップ3: 新しい画像を設定（まだ非表示のまま）
         elements.wallpaper.style.transition = 'none';
         elements.wallpaper.style.backgroundImage = `url(${imageUrl})`;
-        elements.wallpaper.offsetHeight; // リフロー強制
         
-        // 少し待ってブラウザに状態を認識させる
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // ブラウザに確実にレンダリングさせる
+        await new Promise(resolve => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    resolve();
+                });
+            });
+        });
+        
+        // さらに少し待機して画像描画を確実に
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         // ステップ4: 新しい画像をフェードイン（黒から）
         elements.wallpaper.style.transition = 'opacity 0.8s ease-out';
@@ -250,16 +258,8 @@ async function loadWallpaper(direction = 'next') {
         
         state.currentImageUrl = imageUrl;
         
-        // フェードイン完了を確実に検知
-        await new Promise(resolve => {
-            const onTransitionEnd = () => {
-                elements.wallpaper.removeEventListener('transitionend', onTransitionEnd);
-                resolve();
-            };
-            elements.wallpaper.addEventListener('transitionend', onTransitionEnd);
-            // フォールバック：2秒経っても終わらなければ強制的に進む
-            setTimeout(resolve, 2000);
-        });
+        // フェードイン完了を待つ（トランジション時間 + バッファ）
+        await new Promise(resolve => setTimeout(resolve, 900));
         
         // フェードイン完了後にロゴのアニメーション停止
         setLogoLoading(false);
