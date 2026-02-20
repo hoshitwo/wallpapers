@@ -46,6 +46,12 @@ const state = {
     preloadedImages: new Map(), // プリロード済み画像のキャッシュ
     imagePool: [], // APIから取得した画像プール
     usedImageIds: new Set(), // 使用済み画像ID（重複防止）
+    // フィルター設定
+    filters: {
+        unsplash: true,
+        pixabay: true,
+        categories: ['nature', 'backgrounds', 'places', 'buildings', 'travel', 'animals', 'food', 'people', 'sports', 'transportation'],
+    },
 };
 
 // ============================================
@@ -65,6 +71,14 @@ const elements = {
     controls: document.querySelector('.controls'),
     sourceName: document.querySelector('.source-name'),
     sourceCategory: document.querySelector('.source-category'),
+    // フィルター関連
+    btnFilter: document.getElementById('btn-filter'),
+    filterModal: document.getElementById('filter-modal'),
+    filterBackdrop: document.getElementById('filter-backdrop'),
+    filterClose: document.getElementById('filter-close'),
+    filterUnsplash: document.getElementById('filter-unsplash'),
+    filterPixabay: document.getElementById('filter-pixabay'),
+    filterCategories: document.getElementById('filter-categories'),
 };
 
 // ============================================
@@ -75,6 +89,13 @@ const elements = {
  * Pixabay APIから画像を取得
  */
 async function fetchImagesFromPixabay() {
+    // 選択されたカテゴリーからランダムに1つ選ぶ
+    const categories = state.filters.categories;
+    if (categories.length === 0) {
+        return [];
+    }
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    
     // ランダムなページを選択（1-50の範囲）
     const randomPage = Math.floor(Math.random() * 50) + 1;
     
@@ -87,6 +108,7 @@ async function fetchImagesFromPixabay() {
         per_page: CONFIG.IMAGES_PER_REQUEST,
         page: randomPage,
         order: 'popular', // 人気順
+        category: randomCategory, // カテゴリーフィルター
     });
     
     try {
@@ -135,8 +157,23 @@ function generatePicsumImage() {
  * 画像プールから次の画像を取得（Pixabay/Picsum混合）
  */
 async function getNextImageFromPool() {
-    // 50%の確率でPixabayまたはPicsumを選択
-    const usePixabay = Math.random() < CONFIG.PIXABAY_RATIO;
+    const { unsplash, pixabay, categories } = state.filters;
+    
+    // どちらも無効の場合はエラー
+    if (!unsplash && !pixabay) {
+        console.warn('少なくとも1つのソースを有効にしてください');
+        return generatePicsumImage();
+    }
+    
+    // 有効なソースからランダムに選択
+    let usePixabay = false;
+    if (unsplash && pixabay && categories.length > 0) {
+        usePixabay = Math.random() < CONFIG.PIXABAY_RATIO;
+    } else if (pixabay && categories.length > 0) {
+        usePixabay = true;
+    } else {
+        usePixabay = false;
+    }
     
     if (usePixabay) {
         // Pixabayから取得
@@ -434,6 +471,9 @@ function setupEventListeners() {
             case 'S':
                 shareWallpaper();
                 break;
+            case 'Escape':
+                closeFilterModal();
+                break;
         }
     });
 
@@ -464,6 +504,68 @@ function setupEventListeners() {
             }
         }
     }
+    
+    // フィルター関連
+    setupFilterListeners();
+}
+
+// ============================================
+// Filter Functions
+// ============================================
+
+function openFilterModal() {
+    elements.filterModal.classList.remove('hidden');
+}
+
+function closeFilterModal() {
+    elements.filterModal.classList.add('hidden');
+}
+
+function setupFilterListeners() {
+    // フィルターボタン
+    elements.btnFilter.addEventListener('click', openFilterModal);
+    
+    // 閉じるボタン
+    elements.filterClose.addEventListener('click', closeFilterModal);
+    
+    // 背景クリックで閉じる
+    elements.filterBackdrop.addEventListener('click', closeFilterModal);
+    
+    // Unsplashチェックボックス
+    elements.filterUnsplash.addEventListener('change', (e) => {
+        state.filters.unsplash = e.target.checked;
+        clearImagePool();
+    });
+    
+    // Pixabayチェックボックス
+    elements.filterPixabay.addEventListener('change', (e) => {
+        state.filters.pixabay = e.target.checked;
+        // カテゴリーの表示/非表示を切り替え
+        elements.filterCategories.style.display = e.target.checked ? 'block' : 'none';
+        clearImagePool();
+    });
+    
+    // カテゴリーチェックボックス
+    const categoryCheckboxes = elements.filterCategories.querySelectorAll('input[data-category]');
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const category = e.target.dataset.category;
+            if (e.target.checked) {
+                if (!state.filters.categories.includes(category)) {
+                    state.filters.categories.push(category);
+                }
+            } else {
+                state.filters.categories = state.filters.categories.filter(c => c !== category);
+            }
+            clearImagePool();
+        });
+    });
+}
+
+function clearImagePool() {
+    // フィルター変更時にプールをクリア
+    state.imagePool = [];
+    state.usedImageIds.clear();
 }
 
 // ============================================

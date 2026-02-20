@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
     <title>WALLPAPERS</title>
-    <link rel="stylesheet" href="css/style.css?v=45">
+    <link rel="stylesheet" href="css/style.css?v=46">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Share+Tech&display=swap" rel="stylesheet">
@@ -31,6 +31,90 @@
     <!-- Overlay Gradient -->
     <div class="overlay"></div>
 
+    <!-- Filter Modal -->
+    <div class="filter-modal hidden" id="filter-modal">
+        <div class="filter-backdrop" id="filter-backdrop"></div>
+        <div class="filter-panel">
+            <div class="filter-header">
+                <h2 class="filter-title">Source</h2>
+                <button class="filter-close" id="filter-close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="filter-content">
+                <!-- Unsplash -->
+                <label class="filter-item">
+                    <input type="checkbox" id="filter-unsplash" checked>
+                    <span class="filter-checkbox"></span>
+                    <span class="filter-label">Unsplash</span>
+                </label>
+                
+                <!-- Pixabay -->
+                <label class="filter-item">
+                    <input type="checkbox" id="filter-pixabay" checked>
+                    <span class="filter-checkbox"></span>
+                    <span class="filter-label">Pixabay</span>
+                </label>
+                
+                <!-- Pixabay Categories -->
+                <div class="filter-categories" id="filter-categories">
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="nature" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">nature</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="backgrounds" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">backgrounds</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="places" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">places</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="buildings" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">buildings</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="travel" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">travel</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="animals" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">animals</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="food" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">food</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="people" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">people</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="sports" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">sports</span>
+                    </label>
+                    <label class="filter-item filter-sub">
+                        <input type="checkbox" data-category="transportation" checked>
+                        <span class="filter-checkbox"></span>
+                        <span class="filter-label">transportation</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="content">
         <!-- Header -->
@@ -38,9 +122,16 @@
             <div class="logo">
                 <span class="logo-text">WALLPAPERS</span>
             </div>
-            <div class="source">
-                <span class="source-name">Pixabay</span>
-                <span class="source-category"></span>
+            <div class="source-area">
+                <div class="source">
+                    <span class="source-name">Pixabay</span>
+                    <span class="source-category"></span>
+                </div>
+                <button class="btn-filter" id="btn-filter" aria-label="フィルター">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M7 12h10M10 18h4"/>
+                    </svg>
+                </button>
             </div>
         </header>
 
@@ -71,6 +162,6 @@
         </div>
     </main>
 
-    <script src="js/main.js?v=44"></script>
+    <script src="js/main.js?v=46"></script>
 </body>
 </html>
