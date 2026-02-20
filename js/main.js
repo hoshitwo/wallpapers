@@ -263,6 +263,89 @@ async function getNextImageFromPool() {
 // ============================================
 
 /**
+ * PCビューかどうかを判定
+ */
+function isDesktopView() {
+    return window.innerWidth >= 768 && window.matchMedia('(hover: hover)').matches;
+}
+
+/**
+ * 画像から色を抽出してグラデーションを更新（PCのみ）
+ */
+function updateGradientFromImage(imageUrl) {
+    if (!isDesktopView()) return;
+    
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // サンプリング用に小さいサイズで描画
+            const sampleSize = 50;
+            canvas.width = sampleSize;
+            canvas.height = sampleSize;
+            
+            ctx.drawImage(img, 0, 0, sampleSize, sampleSize);
+            
+            // 上部の色を抽出（上から10%の領域）
+            const topData = ctx.getImageData(0, 0, sampleSize, Math.floor(sampleSize * 0.1));
+            const topColor = getAverageColor(topData.data);
+            
+            // 下部の色を抽出（下から10%の領域）
+            const bottomData = ctx.getImageData(0, Math.floor(sampleSize * 0.9), sampleSize, Math.floor(sampleSize * 0.1));
+            const bottomColor = getAverageColor(bottomData.data);
+            
+            // 色を明るく調整（暗すぎないように）
+            const brightenedTop = brightenColor(topColor, 0.4);
+            const brightenedBottom = brightenColor(bottomColor, 0.4);
+            
+            // CSSカスタムプロパティを更新
+            elements.overlay.style.setProperty('--gradient-top', `rgba(${brightenedTop.r}, ${brightenedTop.g}, ${brightenedTop.b}, 0.7)`);
+            elements.overlay.style.setProperty('--gradient-bottom', `rgba(${brightenedBottom.r}, ${brightenedBottom.g}, ${brightenedBottom.b}, 0.7)`);
+        } catch (e) {
+            // CORS エラーなどの場合は無視
+            console.log('Could not extract colors from image');
+        }
+    };
+    
+    img.src = imageUrl;
+}
+
+/**
+ * ピクセルデータから平均色を取得
+ */
+function getAverageColor(data) {
+    let r = 0, g = 0, b = 0;
+    const pixelCount = data.length / 4;
+    
+    for (let i = 0; i < data.length; i += 4) {
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+    }
+    
+    return {
+        r: Math.round(r / pixelCount),
+        g: Math.round(g / pixelCount),
+        b: Math.round(b / pixelCount)
+    };
+}
+
+/**
+ * 色を明るく調整
+ */
+function brightenColor(color, factor) {
+    return {
+        r: Math.min(255, Math.round(color.r + (255 - color.r) * factor)),
+        g: Math.min(255, Math.round(color.g + (255 - color.g) * factor)),
+        b: Math.min(255, Math.round(color.b + (255 - color.b) * factor))
+    };
+}
+
+/**
  * 画像をプリロード
  */
 function preloadImage(url) {
@@ -426,6 +509,9 @@ async function loadWallpaper(direction = 'next') {
         
         // ソース表示を更新
         updateSourceDisplay(imageData);
+        
+        // PCビューの場合、画像から色を抽出してグラデーションを更新
+        updateGradientFromImage(imageUrl);
         
         // フェードイン完了を待つ（トランジション時間 + バッファ）
         await new Promise(resolve => setTimeout(resolve, 900));

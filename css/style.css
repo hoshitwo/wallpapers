@@ -179,6 +179,22 @@ body {
     );
 }
 
+/* PC用：画像から抽出した色でグラデーション */
+@media (min-width: 768px) and (hover: hover) {
+    .overlay {
+        --gradient-top: rgba(0, 0, 0, 0.6);
+        --gradient-bottom: rgba(0, 0, 0, 0.6);
+        background: linear-gradient(
+            to bottom,
+            var(--gradient-top) 0%,
+            transparent 15%,
+            transparent 85%,
+            var(--gradient-bottom) 100%
+        );
+        transition: background 0.5s ease;
+    }
+}
+
 /* Content */
 .content {
     position: relative;
