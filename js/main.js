@@ -275,9 +275,6 @@ function isDesktopView() {
 function updateGradientFromImage(imageUrl) {
     if (!isDesktopView()) return;
     
-    // まずグラデーションを非表示に
-    elements.overlay.classList.remove('visible');
-    
     const img = new Image();
     img.crossOrigin = 'anonymous';
     
@@ -480,6 +477,11 @@ async function loadWallpaper(direction = 'next') {
 
         // ロゴをシマー表示（読み込み中）
         setLogoLoading(true);
+        
+        // PCビューの場合、グラデーションを即座に非表示
+        if (isDesktopView()) {
+            elements.overlay.classList.remove('visible');
+        }
         
         // ステップ1: 現在の画像をフェードアウト（黒へ）
         elements.wallpaper.style.transition = 'opacity 0.5s ease';
