@@ -198,6 +198,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
+    z-index: 20;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -256,6 +257,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    pointer-events: auto;
 }
 
 .source {
@@ -293,6 +295,8 @@ body {
     cursor: pointer;
     transition: all var(--transition-fast);
     padding: 0;
+    position: relative;
+    z-index: 100;
 }
 
 .btn-filter svg {
