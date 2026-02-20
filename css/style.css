@@ -82,13 +82,24 @@ body {
     visibility: hidden;
 }
 
-.loader-ring {
-    width: 48px;
-    height: 48px;
-    border: 2px solid var(--color-glass-border);
-    border-top-color: var(--color-white);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.loader-logo {
+    font-family: 'Share Tech', sans-serif;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.4) 0%,
+        rgba(255, 255, 255, 0.4) 25%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.4) 75%,
+        rgba(255, 255, 255, 0.4) 100%
+    );
+    background-size: 300% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: shimmer 1.5s linear infinite;
 }
 
 @keyframes spin {
