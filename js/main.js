@@ -173,17 +173,16 @@ function showSpinner(show) {
 async function loadWallpaper(direction = 'next') {
     if (state.isLoading) return;
     state.isLoading = true;
-    
-    // スピナー表示
-    showSpinner(true);
 
     try {
         let imageUrl;
+        let isPrefetched = false;
         
         if (direction === 'prev' && state.currentIndex > 0) {
             // 前の画像（履歴から）
             state.currentIndex--;
             imageUrl = state.history[state.currentIndex];
+            isPrefetched = state.preloadedImages.has(imageUrl);
         } else if (direction === 'next') {
             // 次の画像
             state.currentIndex++;
@@ -191,10 +190,12 @@ async function loadWallpaper(direction = 'next') {
             if (state.currentIndex < state.history.length) {
                 // 履歴に次がある場合（プリフェッチ済み）
                 imageUrl = state.history[state.currentIndex];
+                isPrefetched = state.preloadedImages.has(imageUrl);
             } else {
                 // 新しい画像を取得
                 imageUrl = generateWallpaperUrl();
                 state.history.push(imageUrl);
+                isPrefetched = false;
             }
             
             // 残りのプリフェッチ画像が少なくなったら追加でプリフェッチ
@@ -216,6 +217,11 @@ async function loadWallpaper(direction = 'next') {
         
         // フェードアウト完了を待つ
         await new Promise(resolve => setTimeout(resolve, 400));
+        
+        // プリフェッチ済みでない場合のみスピナー表示
+        if (!isPrefetched) {
+            showSpinner(true);
+        }
         
         // ステップ2: 画像をプリロード（プリフェッチ済みならすぐ完了）
         const img = await preloadImage(imageUrl);
