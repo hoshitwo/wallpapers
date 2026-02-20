@@ -69,6 +69,7 @@ const elements = {
     logoText: document.querySelector('.logo-text'),
     header: document.querySelector('.header'),
     controls: document.querySelector('.controls'),
+    source: document.querySelector('.source'),
     sourceName: document.querySelector('.source-name'),
     sourceCategory: document.querySelector('.source-category'),
     // フィルター関連
@@ -407,6 +408,13 @@ function setLogoLoading(loading) {
  */
 function updateSourceDisplay(imageData) {
     if (elements.sourceName) {
+        // アニメーションをリセット
+        if (elements.source) {
+            elements.source.classList.remove('fade-in');
+            // 強制的にリフローを発生させてアニメーションをリセット
+            void elements.source.offsetWidth;
+        }
+        
         if (imageData.source === 'pixabay') {
             elements.sourceName.textContent = 'Pixabay';
             // カテゴリー名を表示
@@ -418,6 +426,11 @@ function updateSourceDisplay(imageData) {
             if (elements.sourceCategory) {
                 elements.sourceCategory.textContent = '';
             }
+        }
+        
+        // アニメーションを開始
+        if (elements.source) {
+            elements.source.classList.add('fade-in');
         }
     }
 }

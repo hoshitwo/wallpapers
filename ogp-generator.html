@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>OGP Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #333;
+            padding: 40px;
+        }
+        
+        .ogp-container {
+            width: 1200px;
+            height: 630px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo {
+            font-family: 'Share Tech', monospace;
+            font-size: 72px;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            color: #fff;
+            font-family: sans-serif;
+            text-align: center;
+        }
+        
+        .instructions p {
+            margin: 10px 0;
+        }
+        
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="ogp-container" id="ogp">
+        <span class="logo">WALLPAPERS</span>
+    </div>
+    
+    <div class="instructions">
+        <p>↑ これがOGP画像（1200×630px）です</p>
+        <button onclick="downloadOGP()">PNGをダウンロード</button>
+    </div>
+    
+    <script>
+        // フォントが読み込まれるのを待つ
+        document.fonts.ready.then(() => {
+            console.log('Fonts loaded');
+        });
+        
+        async function downloadOGP() {
+            // フォントが確実に読み込まれるまで待つ
+            await document.fonts.ready;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 1200;
+            canvas.height = 630;
+            const ctx = canvas.getContext('2d');
+            
+            // 黒背景
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, 1200, 630);
+            
+            // テキスト設定
+            ctx.fillStyle = '#fff';
+            ctx.font = '72px "Share Tech", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.letterSpacing = '22px'; // 0.3em相当
+            
+            // テキスト描画
+            ctx.fillText('WALLPAPERS', 600 + 11, 315); // letter-spacingのオフセット補正
+            
+            // ダウンロード
+            const link = document.createElement('a');
+            link.download = 'ogp.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
+

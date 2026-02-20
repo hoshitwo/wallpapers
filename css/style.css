@@ -310,6 +310,27 @@ body {
     display: none;
 }
 
+/* ソース表示のフェードインアニメーション */
+.source.fade-in .source-name,
+.source.fade-in .source-category {
+    animation: slideInFromRight 0.5s ease forwards;
+}
+
+.source.fade-in .source-category {
+    animation-delay: 0.1s;
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 /* Filter Button */
 .btn-filter {
     display: flex;
