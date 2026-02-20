@@ -612,11 +612,14 @@ async function saveFilters() {
         }
     });
     
-    // 画像プールをクリア
+    // 画像プールを完全にクリア
     clearImagePool();
     
     // モーダルを閉じる
     closeFilterModal();
+    
+    // 新しいフィルター設定でプールを補充
+    await refillImagePool();
     
     // 新しいフィルターで画像を取得
     await loadWallpaper('next');
