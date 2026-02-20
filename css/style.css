@@ -292,11 +292,18 @@ body {
 .source-name,
 .source-category {
     font-family: 'Share Tech', sans-serif;
-    font-size: clamp(0.675rem, 1.8vw, 0.9rem);
     font-weight: 400;
     letter-spacing: 0.1em;
     color: rgba(255, 255, 255, 0.4);
     text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+}
+
+.source-name {
+    font-size: clamp(0.675rem, 1.8vw, 0.9rem);
+}
+
+.source-category {
+    font-size: clamp(0.55rem, 1.5vw, 0.75rem);
 }
 
 .source-category:empty {
@@ -454,6 +461,11 @@ body {
         bottom: clamp(20px, 5vw, 40px);
         right: clamp(20px, 5vw, 40px);
         z-index: 15;
+        opacity: 0;
+    }
+    
+    .hint.loaded {
+        animation: fadeIn 0.8s ease 0.4s forwards;
     }
 }
 

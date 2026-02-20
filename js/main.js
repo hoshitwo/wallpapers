@@ -80,6 +80,7 @@ const elements = {
     filterCategories: document.getElementById('filter-categories'),
     btnCancel: document.getElementById('btn-cancel'),
     btnSave: document.getElementById('btn-save'),
+    hint: document.querySelector('.hint'),
 };
 
 // ============================================
@@ -773,6 +774,9 @@ async function init() {
         requestAnimationFrame(() => {
             elements.header.classList.add('loaded');
             elements.controls.classList.add('loaded');
+            if (elements.hint) {
+                elements.hint.classList.add('loaded');
+            }
         });
         
         // イベントリスナーを設定
