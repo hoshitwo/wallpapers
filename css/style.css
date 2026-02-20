@@ -99,7 +99,12 @@ body {
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
-    animation: shimmer 1.5s linear infinite;
+    animation: shimmerHorizontal 1.5s linear infinite;
+}
+
+@keyframes shimmerHorizontal {
+    0% { background-position: 100% 0; }
+    100% { background-position: 0% 0; }
 }
 
 @keyframes spin {
