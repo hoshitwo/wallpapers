@@ -549,6 +549,11 @@ function setupEventListeners() {
     }, { passive: true });
 
     function handleSwipe() {
+        // フィルターモーダルが開いている場合はスワイプを無視
+        if (!elements.filterModal.classList.contains('hidden')) {
+            return;
+        }
+        
         const diff = touchStartX - touchEndX;
         const threshold = 50;
         
