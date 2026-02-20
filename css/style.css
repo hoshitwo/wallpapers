@@ -111,10 +111,10 @@ body {
 }
 
 .spinner-ring {
-    width: 16px;
-    height: 16px;
-    border: 1.5px solid rgba(255, 255, 255, 0.1);
-    border-top-color: rgba(255, 255, 255, 0.4);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-top-color: rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
 }
