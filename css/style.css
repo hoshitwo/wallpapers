@@ -297,6 +297,7 @@ body {
     padding: 0;
     position: relative;
     z-index: 100;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-filter svg {
