@@ -1,6 +1,6 @@
 /**
  * Answer - iPhone Wallpaper Gallery
- * メインスクリプト
+ * メインスクリプト (Pixabay API版)
  */
 
 'use strict';
@@ -9,11 +9,9 @@
 // Configuration
 // ============================================
 const CONFIG = {
-    // Unsplash API (後でAPIキーを設定)
-    // UNSPLASH_ACCESS_KEY: 'YOUR_ACCESS_KEY',
-    
-    // Picsum API (APIキー不要で使用可能)
-    PICSUM_BASE: 'https://picsum.photos',
+    // Pixabay API
+    PIXABAY_API_KEY: '54724759-5d0fe4647307d61d0042d23f9',
+    PIXABAY_BASE: 'https://pixabay.com/api/',
     
     // iPhone 15 Pro Max の壁紙サイズ
     WALLPAPER_WIDTH: 1290,
@@ -24,6 +22,9 @@ const CONFIG = {
     
     // プリフェッチする画像数
     PREFETCH_COUNT: 5,
+    
+    // 1回のAPI呼び出しで取得する画像数
+    IMAGES_PER_REQUEST: 20,
 };
 
 // ============================================
@@ -34,7 +35,10 @@ const state = {
     history: [],
     isLoading: false,
     currentImageUrl: null,
+    currentImageData: null,
     preloadedImages: new Map(), // プリロード済み画像のキャッシュ
+    imagePool: [], // APIから取得した画像プール
+    usedImageIds: new Set(), // 使用済み画像ID（重複防止）
 };
 
 // ============================================
@@ -55,17 +59,85 @@ const elements = {
 };
 
 // ============================================
-// Wallpaper Functions
+// Pixabay API Functions
 // ============================================
 
 /**
- * ランダムな壁紙URLを生成
+ * Pixabay APIから画像を取得
  */
-function generateWallpaperUrl() {
-    const seed = Date.now() + Math.random();
-    // 縦長の画像を取得（iPhone壁紙向け）
-    return `${CONFIG.PICSUM_BASE}/seed/${seed}/1080/2340`;
+async function fetchImagesFromPixabay() {
+    // ランダムなページを選択（1-50の範囲）
+    const randomPage = Math.floor(Math.random() * 50) + 1;
+    
+    const params = new URLSearchParams({
+        key: CONFIG.PIXABAY_API_KEY,
+        image_type: 'photo',
+        orientation: 'vertical', // 縦向き画像のみ
+        min_height: 1920, // 高解像度のみ
+        safesearch: 'true',
+        per_page: CONFIG.IMAGES_PER_REQUEST,
+        page: randomPage,
+        order: 'popular', // 人気順
+    });
+    
+    try {
+        const response = await fetch(`${CONFIG.PIXABAY_BASE}?${params}`);
+        
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // 未使用の画像のみをフィルタリング
+        const newImages = data.hits.filter(img => !state.usedImageIds.has(img.id));
+        
+        return newImages;
+    } catch (error) {
+        console.error('Pixabay API エラー:', error);
+        return [];
+    }
 }
+
+/**
+ * 画像プールを補充
+ */
+async function refillImagePool() {
+    if (state.imagePool.length < CONFIG.PREFETCH_COUNT) {
+        const newImages = await fetchImagesFromPixabay();
+        state.imagePool.push(...newImages);
+    }
+}
+
+/**
+ * 画像プールから次の画像を取得
+ */
+async function getNextImageFromPool() {
+    // プールが空なら補充
+    if (state.imagePool.length === 0) {
+        await refillImagePool();
+    }
+    
+    // プールから画像を取り出し
+    const imageData = state.imagePool.shift();
+    
+    if (imageData) {
+        state.usedImageIds.add(imageData.id);
+        
+        // プールが少なくなったらバックグラウンドで補充
+        if (state.imagePool.length < CONFIG.PREFETCH_COUNT) {
+            refillImagePool();
+        }
+        
+        return imageData;
+    }
+    
+    return null;
+}
+
+// ============================================
+// Wallpaper Functions
+// ============================================
 
 /**
  * 画像をプリロード
@@ -92,81 +164,18 @@ function preloadImage(url) {
  * 次の画像を先読み
  */
 async function prefetchNextImages() {
-    const startIndex = state.history.length;
-    
     for (let i = 0; i < CONFIG.PREFETCH_COUNT; i++) {
-        const url = generateWallpaperUrl();
-        state.history.push(url);
-        
-        // バックグラウンドでプリロード（エラーは無視）
-        preloadImage(url).catch(() => {});
-    }
-}
-
-/**
- * 画像から主要な色を抽出
- */
-function extractDominantColor(img) {
-    try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // サンプリング用に小さくリサイズ
-        const sampleSize = 50;
-        canvas.width = sampleSize;
-        canvas.height = sampleSize;
-        
-        ctx.drawImage(img, 0, 0, sampleSize, sampleSize);
-        
-        const imageData = ctx.getImageData(0, 0, sampleSize, sampleSize);
-        const data = imageData.data;
-        
-        let r = 0, g = 0, b = 0;
-        let count = 0;
-        
-        // 上部と下部のピクセルをサンプリング
-        for (let y = 0; y < sampleSize; y++) {
-            // 上部10%と下部10%のみ
-            if (y < sampleSize * 0.1 || y > sampleSize * 0.9) {
-                for (let x = 0; x < sampleSize; x++) {
-                    const i = (y * sampleSize + x) * 4;
-                    r += data[i];
-                    g += data[i + 1];
-                    b += data[i + 2];
-                    count++;
-                }
-            }
+        const imageData = await getNextImageFromPool();
+        if (imageData) {
+            const url = imageData.largeImageURL;
+            state.history.push({
+                url: url,
+                data: imageData,
+            });
+            
+            // バックグラウンドでプリロード（エラーは無視）
+            preloadImage(url).catch(() => {});
         }
-        
-        // 平均色を計算（少し暗めに調整）
-        r = Math.floor((r / count) * 0.7);
-        g = Math.floor((g / count) * 0.7);
-        b = Math.floor((b / count) * 0.7);
-        
-        return `${r}, ${g}, ${b}`;
-    } catch (e) {
-        console.error('色抽出エラー:', e);
-        return '0, 0, 0';
-    }
-}
-
-/**
- * グラデーションの色を更新
- */
-function updateGradientColor(color) {
-    if (elements.overlay) {
-        elements.overlay.style.setProperty('--gradient-color', color);
-    }
-}
-
-/**
- * スピナーを表示/非表示
- */
-function showSpinner(show) {
-    if (show) {
-        elements.spinner.classList.remove('hidden');
-    } else {
-        elements.spinner.classList.add('hidden');
     }
 }
 
@@ -175,9 +184,9 @@ function showSpinner(show) {
  */
 function setLogoLoading(loading) {
     if (loading) {
-        elements.logoText.classList.add('loading');
+        elements.logoText.classList.add('shimmer');
     } else {
-        elements.logoText.classList.remove('loading');
+        elements.logoText.classList.remove('shimmer');
     }
 }
 
@@ -190,26 +199,36 @@ async function loadWallpaper(direction = 'next') {
 
     try {
         let imageUrl;
-        let isPrefetched = false;
+        let imageData;
         
         if (direction === 'prev' && state.currentIndex > 0) {
             // 前の画像（履歴から）
             state.currentIndex--;
-            imageUrl = state.history[state.currentIndex];
-            isPrefetched = state.preloadedImages.has(imageUrl);
+            const historyItem = state.history[state.currentIndex];
+            imageUrl = historyItem.url;
+            imageData = historyItem.data;
         } else if (direction === 'next') {
             // 次の画像
             state.currentIndex++;
             
             if (state.currentIndex < state.history.length) {
                 // 履歴に次がある場合（プリフェッチ済み）
-                imageUrl = state.history[state.currentIndex];
-                isPrefetched = state.preloadedImages.has(imageUrl);
+                const historyItem = state.history[state.currentIndex];
+                imageUrl = historyItem.url;
+                imageData = historyItem.data;
             } else {
                 // 新しい画像を取得
-                imageUrl = generateWallpaperUrl();
-                state.history.push(imageUrl);
-                isPrefetched = false;
+                const newImageData = await getNextImageFromPool();
+                if (newImageData) {
+                    imageUrl = newImageData.largeImageURL;
+                    imageData = newImageData;
+                    state.history.push({
+                        url: imageUrl,
+                        data: imageData,
+                    });
+                } else {
+                    throw new Error('画像の取得に失敗しました');
+                }
             }
             
             // 残りのプリフェッチ画像が少なくなったら追加でプリフェッチ
@@ -225,7 +244,7 @@ async function loadWallpaper(direction = 'next') {
             }
         }
 
-        // ロゴをパルス表示（読み込み中）
+        // ロゴをシマー表示（読み込み中）
         setLogoLoading(true);
         
         // ステップ1: 現在の画像をフェードアウト（黒へ）
@@ -236,7 +255,7 @@ async function loadWallpaper(direction = 'next') {
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // ステップ2: 画像をプリロード
-        const img = await preloadImage(imageUrl);
+        await preloadImage(imageUrl);
         
         // ステップ3: 新しい画像を設定（まだ非表示のまま）
         elements.wallpaper.style.transition = 'none';
@@ -259,6 +278,7 @@ async function loadWallpaper(direction = 'next') {
         elements.wallpaper.style.opacity = '1';
         
         state.currentImageUrl = imageUrl;
+        state.currentImageData = imageData;
         
         // フェードイン完了を待つ（トランジション時間 + バッファ）
         await new Promise(resolve => setTimeout(resolve, 900));
@@ -272,7 +292,7 @@ async function loadWallpaper(direction = 'next') {
 
     } catch (error) {
         console.error('画像の読み込みに失敗しました:', error);
-        showSpinner(false);
+        setLogoLoading(false);
     } finally {
         state.isLoading = false;
     }
@@ -289,8 +309,8 @@ async function shareWallpaper() {
     elements.btnShare.style.pointerEvents = 'none';
     
     try {
-        // 高解像度版のURLを生成
-        const hdUrl = state.currentImageUrl.replace('/1080/2340', `/${CONFIG.WALLPAPER_WIDTH}/${CONFIG.WALLPAPER_HEIGHT}`);
+        // Pixabayの高解像度画像URL
+        const hdUrl = state.currentImageData?.largeImageURL || state.currentImageUrl;
         
         // Web Share API が使えるか確認
         if (navigator.share && navigator.canShare) {
@@ -327,7 +347,7 @@ async function shareWallpaper() {
         if (error.name !== 'AbortError') {
             console.error('共有に失敗しました:', error);
             // フォールバック: 新しいタブで開く
-            const hdUrl = state.currentImageUrl.replace('/1080/2340', `/${CONFIG.WALLPAPER_WIDTH}/${CONFIG.WALLPAPER_HEIGHT}`);
+            const hdUrl = state.currentImageData?.largeImageURL || state.currentImageUrl;
             window.open(hdUrl, '_blank');
         }
     } finally {
@@ -399,25 +419,35 @@ function setupEventListeners() {
 // ============================================
 
 async function init() {
-    // 初期の壁紙を読み込み
-    await loadWallpaper('next');
-    
-    // 次の画像をバックグラウンドでプリフェッチ
-    prefetchNextImages();
-    
-    // ローダーを非表示
-    elements.loader.classList.add('hidden');
-    
-    // UIをフェードイン（初回ロード時のみ）
-    requestAnimationFrame(() => {
-        elements.header.classList.add('loaded');
-        elements.controls.classList.add('loaded');
-    });
-    
-    // イベントリスナーを設定
-    setupEventListeners();
-    
-    console.log('🖼️ Answer Wallpaper Gallery が起動しました');
+    try {
+        // APIから初期画像を取得
+        await refillImagePool();
+        
+        // 初期の壁紙を読み込み
+        await loadWallpaper('next');
+        
+        // 次の画像をバックグラウンドでプリフェッチ
+        prefetchNextImages();
+        
+        // ローダーを非表示
+        elements.loader.classList.add('hidden');
+        
+        // UIをフェードイン（初回ロード時のみ）
+        requestAnimationFrame(() => {
+            elements.header.classList.add('loaded');
+            elements.controls.classList.add('loaded');
+        });
+        
+        // イベントリスナーを設定
+        setupEventListeners();
+        
+        console.log('🖼️ Wallpapers Gallery (Pixabay) が起動しました');
+        
+    } catch (error) {
+        console.error('初期化エラー:', error);
+        // エラー時はPicsumにフォールバック
+        alert('画像の読み込みに失敗しました。ページを再読み込みしてください。');
+    }
 }
 
 // DOM Ready
