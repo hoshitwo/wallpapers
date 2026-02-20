@@ -218,10 +218,8 @@ async function loadWallpaper(direction = 'next') {
         // フェードアウト完了を待つ
         await new Promise(resolve => setTimeout(resolve, 400));
         
-        // プリフェッチ済みでない場合のみスピナー表示
-        if (!isPrefetched) {
-            showSpinner(true);
-        }
+        // スピナー表示
+        showSpinner(true);
         
         // ステップ2: 画像をプリロード（プリフェッチ済みならすぐ完了）
         const img = await preloadImage(imageUrl);
