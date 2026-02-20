@@ -13,6 +13,9 @@ const CONFIG = {
     PIXABAY_API_KEY: '54724759-5d0fe4647307d61d0042d23f9',
     PIXABAY_BASE: 'https://pixabay.com/api/',
     
+    // Picsum API
+    PICSUM_BASE: 'https://picsum.photos',
+    
     // iPhone 15 Pro Max の壁紙サイズ
     WALLPAPER_WIDTH: 1290,
     WALLPAPER_HEIGHT: 2796,
@@ -25,6 +28,9 @@ const CONFIG = {
     
     // 1回のAPI呼び出しで取得する画像数
     IMAGES_PER_REQUEST: 20,
+    
+    // Pixabayの使用比率 (0.0 - 1.0)
+    PIXABAY_RATIO: 0.5,
 };
 
 // ============================================
@@ -36,6 +42,7 @@ const state = {
     isLoading: false,
     currentImageUrl: null,
     currentImageData: null,
+    currentSource: null, // 'pixabay' or 'picsum'
     preloadedImages: new Map(), // プリロード済み画像のキャッシュ
     imagePool: [], // APIから取得した画像プール
     usedImageIds: new Set(), // 使用済み画像ID（重複防止）
@@ -56,6 +63,7 @@ const elements = {
     logoText: document.querySelector('.logo-text'),
     header: document.querySelector('.header'),
     controls: document.querySelector('.controls'),
+    sourceText: document.querySelector('.source-text'),
 };
 
 // ============================================
@@ -110,29 +118,47 @@ async function refillImagePool() {
 }
 
 /**
- * 画像プールから次の画像を取得
+ * Picsumから画像データを生成
+ */
+function generatePicsumImage() {
+    const seed = Date.now() + Math.random();
+    const url = `${CONFIG.PICSUM_BASE}/seed/${seed}/1080/2340`;
+    return {
+        id: `picsum_${seed}`,
+        largeImageURL: url,
+        source: 'picsum',
+    };
+}
+
+/**
+ * 画像プールから次の画像を取得（Pixabay/Picsum混合）
  */
 async function getNextImageFromPool() {
-    // プールが空なら補充
-    if (state.imagePool.length === 0) {
-        await refillImagePool();
-    }
+    // 50%の確率でPixabayまたはPicsumを選択
+    const usePixabay = Math.random() < CONFIG.PIXABAY_RATIO;
     
-    // プールから画像を取り出し
-    const imageData = state.imagePool.shift();
-    
-    if (imageData) {
-        state.usedImageIds.add(imageData.id);
-        
-        // プールが少なくなったらバックグラウンドで補充
-        if (state.imagePool.length < CONFIG.PREFETCH_COUNT) {
-            refillImagePool();
+    if (usePixabay) {
+        // Pixabayから取得
+        if (state.imagePool.length === 0) {
+            await refillImagePool();
         }
         
-        return imageData;
+        const imageData = state.imagePool.shift();
+        
+        if (imageData) {
+            state.usedImageIds.add(imageData.id);
+            
+            // プールが少なくなったらバックグラウンドで補充
+            if (state.imagePool.length < CONFIG.PREFETCH_COUNT) {
+                refillImagePool();
+            }
+            
+            return { ...imageData, source: 'pixabay' };
+        }
     }
     
-    return null;
+    // Picsumから取得（Pixabayが空の場合もフォールバック）
+    return generatePicsumImage();
 }
 
 // ============================================
@@ -187,6 +213,19 @@ function setLogoLoading(loading) {
         elements.logoText.classList.add('shimmer');
     } else {
         elements.logoText.classList.remove('shimmer');
+    }
+}
+
+/**
+ * ソース表示を更新
+ */
+function updateSourceDisplay(source) {
+    if (elements.sourceText) {
+        if (source === 'pixabay') {
+            elements.sourceText.textContent = 'via Pixabay';
+        } else {
+            elements.sourceText.textContent = 'via Unsplash';
+        }
     }
 }
 
@@ -279,6 +318,10 @@ async function loadWallpaper(direction = 'next') {
         
         state.currentImageUrl = imageUrl;
         state.currentImageData = imageData;
+        state.currentSource = imageData.source;
+        
+        // ソース表示を更新
+        updateSourceDisplay(imageData.source);
         
         // フェードイン完了を待つ（トランジション時間 + バッファ）
         await new Promise(resolve => setTimeout(resolve, 900));
