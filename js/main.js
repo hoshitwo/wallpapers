@@ -265,7 +265,7 @@ async function loadWallpaper(direction = 'next') {
         setLogoLoading(false);
 
         // 前へボタンの状態更新
-        elements.btnPrev.style.opacity = state.currentIndex > 0 ? '1' : '0.3';
+        elements.btnPrev.style.opacity = state.currentIndex > 0 ? '0.6' : '0.2';
         elements.btnPrev.style.pointerEvents = state.currentIndex > 0 ? 'auto' : 'none';
 
     } catch (error) {
