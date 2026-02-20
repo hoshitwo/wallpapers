@@ -528,9 +528,9 @@ kbd {
     position: relative;
     width: 280px;
     max-height: 80vh;
-    background: rgba(30, 30, 30, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     overflow: hidden;
     animation: scaleIn 0.25s ease;
 }
@@ -551,7 +551,7 @@ kbd {
     align-items: center;
     justify-content: space-between;
     padding: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: none;
 }
 
 .filter-title {
@@ -652,7 +652,7 @@ kbd {
 }
 
 .filter-categories {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: none;
     margin-top: 4px;
     padding-top: 4px;
 }
@@ -660,7 +660,7 @@ kbd {
 /* Filter Footer */
 .filter-footer {
     padding: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
 }
 
 .btn-save {
