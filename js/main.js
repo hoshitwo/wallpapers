@@ -222,7 +222,11 @@ async function loadWallpaper(direction = 'next') {
         showSpinner(true);
         
         // ステップ2: 画像をプリロード（プリフェッチ済みならすぐ完了）
-        const img = await preloadImage(imageUrl);
+        // 最低200ms表示してリッチ感を出す
+        const [img] = await Promise.all([
+            preloadImage(imageUrl),
+            new Promise(resolve => setTimeout(resolve, 200))
+        ]);
         
         // スピナー非表示
         showSpinner(false);
